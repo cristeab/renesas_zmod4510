@@ -1,4 +1,4 @@
-# Renesas ZMOD4510 Sensor Firmware for Rapberry Pi5
+# Renesas ZMOD4510 Sensor Firmware for Raspberry Pi5
 
 This is a modified version of the firmware provided by Renesas for the ZMOD4510 O3 and NO2 sensor.
 The following changes have been made:
