@@ -17,7 +17,6 @@
 #include "zmod4xxx.h"
 #include "zmod4xxx_hal.h"
 #include "zmod4xxx_cleaning.h"
-#include "hsxxxx.h"
 #include "no2_o3.h"
 #include "zmod4510_config_no2_o3.h"
 
@@ -35,11 +34,6 @@ static uint8_t prod_data[ZMOD4510_PROD_DATA_LEN];
 static no2_o3_handle_t  algo_handle;
 static no2_o3_results_t algo_results;
 static no2_o3_inputs_t  algo_input;
-
-/* Temperature and humidity sensor related declarations */
-static HSxxxx_t          hsxxxx;
-static HSxxxx_t*         htSensor = NULL;  /* pointer will be set if HSxxxx is found */
-static HSxxxx_Results_t  htResults;
 
 int  detect_and_configure(zmod4xxx_dev_t*, int, char const**);
 void read_and_verify(zmod4xxx_dev_t*, uint8_t*, char const*);
@@ -75,26 +69,15 @@ int main() {
         HAL_HandleError ( ret, errContext );
     }
 
-    printf("\n##### Setting up HSxxxx sensor #####\n");
+    printf("Using on-chip temperature sensor and 50%% relative humidity!\n\n");
 
-    /* Try finding a Renesas temperature and humidity sensor - example will work 
-     * without it, but results will be less accurate. */
-    ret = HSxxxx_Init(&hsxxxx, &hal);
-    if ( ret ) {
-        printf("No temperature/humidity sensor found, using on-chip");
-        printf(" temperature sensor and 50%% relative humidity!\n\n");
-    }
-    else {
-        htSensor = &hsxxxx;
-        printf("Found %s humdity & temperature sensor\n\n", HSxxxx_Name ( htSensor ));
-    }
     /* Set default values for temperature and humidity: These values will be used
      * if no sensor is detected or if reading the sensor fails. 
      * The temperature value of -300°C causes the algo to use the on-chip temperature
      * measurement of the gas sensor. However, an external temperature and humidity
      * sensor provides better accuracy and is the preferred input source. */
-    htResults.temperature = -300;
-    htResults.humidity    =  50;
+    float default_temperature = -300;
+    float default_humidity    =  50;
 
     /* One-time initialization of the algorithm. Handle passed to calculation
      * function. */
@@ -104,12 +87,7 @@ int main() {
     }
 
     while ( 1 ) {
-        /* If a sensor was detected, read temperature and humidity from it.
-         * Errors occuring during read are ignored: In case of error the 
-         * HSxxx API leaves data in the result data structure unmodified. */
-        if (htSensor) {
-            HSxxxx_Measure(htSensor, &htResults);
-        }
+        /* If a sensor was detected, read temperature and humidity from it. */
         
         /* Start a measurement. */
         ret = zmod4xxx_start_measurement(&dev);
@@ -127,8 +105,8 @@ int main() {
         
         /* Assign algorithm inputs: raw sensor data and ambient conditions. */
         algo_input.adc_result       = adc_result;
-        algo_input.humidity_pct     = htResults.humidity;
-        algo_input.temperature_degc = htResults.temperature;
+        algo_input.humidity_pct     = default_temperature;
+        algo_input.temperature_degc = default_humidity;
         
         /* Calculate algorithm results. */
         ret = calc_no2_o3(&algo_handle, &dev, &algo_input, &algo_results);
@@ -141,10 +119,8 @@ int main() {
         printf("  NO2_conc    = %8.3f ppb\n", algo_results.NO2_conc_ppb);
         printf("  Fast AQI    = %8i\n", algo_results.FAST_AQI);
         printf("  EPA AQI     = %8i\n", algo_results.EPA_AQI);
-        if ( htSensor ) {
-            printf("  Temperature = %8.2f degC\n", htResults.temperature);
-            printf("  Humidity    = %8.2f %%rH\n", htResults.humidity);
-        }
+        printf("  Temperature = %8.2f degC\n", default_temperature);
+        printf("  Humidity    = %8.2f %%rH\n", default_humidity);
     
         /* Check validity of the algorithm results. */
         switch (ret) {
