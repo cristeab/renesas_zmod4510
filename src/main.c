@@ -43,7 +43,9 @@ int main() {
             break;
         /* Exit program due to unexpected error. */
         default:
-            HAL_HandleError(ret, "Algorithm calculation");
+            printf("Unexpected status.\n");
+            sensor_close();
+            return EXIT_FAILURE;
         }
     }
     sensor_close();

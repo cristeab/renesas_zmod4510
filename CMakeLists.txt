@@ -24,10 +24,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 # Link libraries directly
 target_link_directories(${PROJECT_NAME} PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/lib")
-target_link_libraries(${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME} PRIVATE
     _no2_o3.a
     _zmod4xxx_cleaning.a
     m)
 
 # Add executable
-add_executable(${EXE_NAME} ${COMMON_SOURCES} src/main.c)
+add_executable(${EXE_NAME} src/main.c)
+target_include_directories(${EXE_NAME} PRIVATE
+    src/algos src/sensors)
+target_link_libraries(${EXE_NAME} ${PROJECT_NAME})
