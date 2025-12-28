@@ -29,7 +29,7 @@ class ZMOD4510:
         logging.basicConfig(level=log_level)
 
         try:
-            library_path = os.path.join(os.path.dirname(__file__), library_name)
+            library_path = os.path.join(os.path.dirname(__file__), "lib", library_name)
             self.lib = ctypes.CDLL(library_path)
         except OSError as e:
             self.logger.error(f"Failed to load library: {e}")
