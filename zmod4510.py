@@ -65,7 +65,7 @@ if __name__ == "__main__":
     try:
         if not sensor.start():
             raise RuntimeError("Failed to start sensor.")
-        logger.info("Sensor started. Press Ctrl+C to stop.")
+        sensor.logger.info("Sensor started. Press Ctrl+C to stop.")
         
         while True:
             # Example: You could get real T/RH from another Python library here
@@ -76,18 +76,18 @@ if __name__ == "__main__":
             
             match data.status:
                 case ZMODStatus.STABILIZATION:
-                    logger.info("Warming up...")
+                    sensor.logger.info("Warming up...")
 
                 case ZMODStatus.OK:
-                    logger.info(f"O3: {data.o3_ppb:.2f} ppb | NO2: {data.no2_ppb:.2f} ppb | "
+                    sensor.logger.info(f"O3: {data.o3_ppb:.2f} ppb | NO2: {data.no2_ppb:.2f} ppb | "
                         f"Fast AQI: {data.fast_aqi} | EPA AQI: {data.epa_aqi}")
 
                 case ZMODStatus.DAMAGE:
-                    logger.error("Damaged.")
+                    sensor.logger.error("Damaged.")
                 case _:
-                    logger.error(f"Unknown status: {data.status}")
-            
+                    sensor.logger.error(f"Unknown status: {data.status}")
+
     except KeyboardInterrupt:
-        logger.info("\nStopping sensor...")
+        sensor.logger.info("\nStopping sensor...")
     finally:
         sensor.stop()
