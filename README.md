@@ -25,3 +25,7 @@ Run the generated binary with:
 * Install with pip from the sources root folder
 
     pip install .
+
+* Verify that the Python module is installed
+
+    python3 -c "import zmod4510; print(zmod4510.__file__)"

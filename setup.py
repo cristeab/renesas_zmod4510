@@ -5,6 +5,7 @@ setup(
     version="0.1.0",
     description="ZMOD4510 firmware with Python bindings",
     packages=["zmod4510"],
+    package_dir={"zmod4510": "python"},
     cmake_install_dir=".",
     python_requires=">=3.10",
 )

@@ -5,6 +5,7 @@ import ctypes
 from enum import IntEnum
 from pathlib import Path
 import logging
+import os
 
 
 class ZMODStatus(IntEnum):
@@ -23,12 +24,13 @@ class SensorResults(ctypes.Structure):
     ]
 
 class ZMOD4510:
-    def __init__(self, library_path="libzmod4510.so", logger=None, log_level=logging.INFO):
+    def __init__(self, library_name="libzmod4510.so", logger=None, log_level=logging.INFO):
         self.logger = logger or logging.getLogger(__name__)
         logging.basicConfig(level=log_level)
 
         try:
-            self.lib = ctypes.CDLL(str(Path(library_path).absolute()))
+            library_path = os.path.join(os.path.dirname(__file__), library_name)
+            self.lib = ctypes.CDLL(library_path)
         except OSError as e:
             self.logger.error(f"Failed to load library: {e}")
             return
