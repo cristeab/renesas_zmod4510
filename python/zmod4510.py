@@ -30,21 +30,21 @@ class ZMOD4510:
 
         try:
             library_path = os.path.join(os.path.dirname(__file__), "lib", library_name)
-            self.lib = ctypes.CDLL(library_path)
+            self._lib = ctypes.CDLL(library_path)
         except OSError as e:
             self.logger.error(f"Failed to load library: {e}")
-            return
+            raise
         
         # Define function signatures
-        self.lib.sensor_init.restype = ctypes.c_int
-        
-        self.lib.sensor_step.argtypes = [ctypes.c_float, ctypes.c_float, ctypes.POINTER(SensorResults)]
-        self.lib.sensor_step.restype = ctypes.c_int
-        
-        self.lib.sensor_close.restype = None
+        self._lib.sensor_init.restype = ctypes.c_int
+
+        self._lib.sensor_step.argtypes = [ctypes.c_float, ctypes.c_float, ctypes.POINTER(SensorResults)]
+        self._lib.sensor_step.restype = ctypes.c_int
+
+        self._lib.sensor_close.restype = None
 
     def start(self):
-        res = self.lib.sensor_init()
+        res = self._lib.sensor_init()
         if res != 0:
             self.logger.error(f"Sensor Init Failed with code {res}")
             return False
@@ -52,13 +52,13 @@ class ZMOD4510:
 
     def get_data(self, temperature, humidity):
         results = SensorResults()
-        self.lib.sensor_step(temperature, humidity, ctypes.byref(results))
+        self._lib.sensor_step(temperature, humidity, ctypes.byref(results))
         return results
 
     def stop(self):
-        self.lib.sensor_close()
+        self._lib.sensor_close()
 
-# --- Main Python Execution Loop ---
+
 if __name__ == "__main__":
     sensor = ZMOD4510()
     

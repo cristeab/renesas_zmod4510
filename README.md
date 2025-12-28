@@ -22,7 +22,7 @@ Run the generated binary with:
 
 * Optionally, activate your Python virtual environment
 
-* Install with pip from the sources root folder
+* Compile and install from the sources root folder
 
     pip install .
 
