@@ -36,4 +36,4 @@ target_include_directories(${EXE_NAME} PRIVATE
 target_link_libraries(${EXE_NAME} ${PROJECT_NAME})
 
 # Crucial: This tells scikit-build where to put the .so file
-install(TARGETS ${PROJECT_NAME} DESTINATION .)
+install(TARGETS ${PROJECT_NAME} LIBRARY DESTINATION .)

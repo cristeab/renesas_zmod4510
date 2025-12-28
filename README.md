@@ -22,4 +22,4 @@ Run the generated binary with:
 
 * Install with pip
 
-    pip install --no-build-isolation .
+    pip install .

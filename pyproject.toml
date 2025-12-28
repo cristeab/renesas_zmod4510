@@ -1,12 +1,3 @@
 [build-system]
-requires = ["scikit-build-core>=0.5", "setuptools"]
-build-backend = "scikit_build_core.build_meta"
-
-[project]
-name = "zmod4510"
-version = "0.1.0"
-dependencies = []
-
-[tool.scikit-build]
-# This ensures the compiled library is placed inside the python package
-wheel.install-dir = "zmod4510"
+requires = ["setuptools>=65", "wheel", "scikit-build"]
+build-backend = "setuptools.build_meta"
