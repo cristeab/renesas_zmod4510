@@ -50,9 +50,7 @@ class ZMOD4510:
 
     def get_data(self, temperature, humidity):
         results = SensorResults()
-        res = self.lib.sensor_step(temperature, humidity, ctypes.byref(results))
-        if res != 0:
-            self.logger.warning(f"Warning: Measurement step failed ({res})")
+        self.lib.sensor_step(temperature, humidity, ctypes.byref(results))
         return results
 
     def stop(self):
