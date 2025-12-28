@@ -4,6 +4,7 @@
 import ctypes
 from enum import IntEnum
 from pathlib import Path
+import logging
 
 
 class ZMODStatus(IntEnum):
@@ -22,8 +23,15 @@ class SensorResults(ctypes.Structure):
     ]
 
 class ZMOD4510:
-    def __init__(self, library_path="./libzmod.so"):
-        self.lib = ctypes.CDLL(str(Path(library_path).absolute()))
+    def __init__(self, library_path="./libzmod4510.so", logger=None, log_level=logging.INFO):
+        self.logger = logger or logging.getLogger(__name__)
+        logging.basicConfig(level=log_level)
+
+        try:
+            self.lib = ctypes.CDLL(str(Path(library_path).absolute()))
+        except OSError as e:
+            self.logger.error(f"Failed to load library: {e}")
+            return
         
         # Define function signatures
         self.lib.sensor_init.restype = ctypes.c_int
@@ -36,13 +44,15 @@ class ZMOD4510:
     def start(self):
         res = self.lib.sensor_init()
         if res != 0:
-            raise RuntimeError(f"Sensor Init Failed with code {res}")
+            self.logger.error(f"Sensor Init Failed with code {res}")
+            return False
+        return True
 
     def get_data(self, temperature, humidity):
         results = SensorResults()
         res = self.lib.sensor_step(temperature, humidity, ctypes.byref(results))
         if res != 0:
-            print(f"Warning: Measurement step failed ({res})")
+            self.logger.warning(f"Warning: Measurement step failed ({res})")
         return results
 
     def stop(self):
@@ -53,8 +63,9 @@ if __name__ == "__main__":
     sensor = ZMOD4510()
     
     try:
-        sensor.start()
-        print("Sensor started. Press Ctrl+C to stop.")
+        if not sensor.start():
+            raise RuntimeError("Failed to start sensor.")
+        logger.info("Sensor started. Press Ctrl+C to stop.")
         
         while True:
             # Example: You could get real T/RH from another Python library here
@@ -65,19 +76,18 @@ if __name__ == "__main__":
             
             match data.status:
                 case ZMODStatus.STABILIZATION:
-                    print("Warming up...")
+                    logger.info("Warming up...")
 
                 case ZMODStatus.OK:
-                    print(f"O3: {data.o3_ppb:.2f} ppb | NO2: {data.no2_ppb:.2f} ppb | "
+                    logger.info(f"O3: {data.o3_ppb:.2f} ppb | NO2: {data.no2_ppb:.2f} ppb | "
                         f"Fast AQI: {data.fast_aqi} | EPA AQI: {data.epa_aqi}")
 
                 case ZMODStatus.DAMAGE:
-                    print("Damaged.")
-
+                    logger.error("Damaged.")
                 case _:
-                    print(f"Unknown status: {data.status}")
+                    logger.error(f"Unknown status: {data.status}")
             
     except KeyboardInterrupt:
-        print("\nStopping sensor...")
+        logger.info("\nStopping sensor...")
     finally:
         sensor.stop()
