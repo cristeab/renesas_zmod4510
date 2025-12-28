@@ -9,7 +9,7 @@ The following changes have been made:
 
 # Compilation Instructions
 
-    cmake -S . -B build
+    cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
     cmake --build build
 
 Run the generated binary with:
