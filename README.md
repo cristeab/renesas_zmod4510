@@ -9,6 +9,8 @@ The following changes have been made:
 
 # Compilation Instructions
 
+From the sources root folder:
+
     cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
     cmake --build build
 
@@ -20,6 +22,6 @@ Run the generated binary with:
 
 * Optionally, activate your Python virtual environment
 
-* Install with pip
+* Install with pip from the sources root folder
 
     pip install .
