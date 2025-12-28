@@ -40,6 +40,5 @@ pip install .
 * Verify that the Python module is installed
 
 ```bash
-python3 -c "import zmod4510; print(zmod4510.__file__)"
-python3 -c "from zmod4510 import ZMOD4510; s = ZMOD4510(); print(dir(s))"
+python3 -c "import zmod4510; print(zmod4510.__file__); s = zmod4510.ZMOD4510(); print(dir(s))"
 ```
