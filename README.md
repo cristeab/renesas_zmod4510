@@ -20,7 +20,10 @@ Run the generated binary with:
 
 # Install the Python module
 
-* Optionally, activate your Python virtual environment
+* Optionally, create and activate a Python virtual environment
+
+    python3 -m venv .venv-test
+    source ./.venv-test/bin/activate
 
 * Compile and install from the sources root folder
 
@@ -29,3 +32,4 @@ Run the generated binary with:
 * Verify that the Python module is installed
 
     python3 -c "import zmod4510; print(zmod4510.__file__)"
+    python3 -c "from zmod4510 import ZMOD4510; s = ZMOD4510(); print(dir(s))"
