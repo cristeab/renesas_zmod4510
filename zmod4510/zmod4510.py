@@ -23,7 +23,7 @@ class SensorResults(ctypes.Structure):
     ]
 
 class ZMOD4510:
-    def __init__(self, library_path="./libzmod4510.so", logger=None, log_level=logging.INFO):
+    def __init__(self, library_path="libzmod4510.so", logger=None, log_level=logging.INFO):
         self.logger = logger or logging.getLogger(__name__)
         logging.basicConfig(level=log_level)
 

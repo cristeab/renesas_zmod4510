@@ -34,3 +34,6 @@ add_executable(${EXE_NAME} src/main.c)
 target_include_directories(${EXE_NAME} PRIVATE
     src/algos src/sensors)
 target_link_libraries(${EXE_NAME} ${PROJECT_NAME})
+
+# Crucial: This tells scikit-build where to put the .so file
+install(TARGETS ${PROJECT_NAME} DESTINATION .)

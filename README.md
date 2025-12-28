@@ -16,3 +16,10 @@ Run the generated binary with:
 
     build/no2_o3-example
 
+# Install the Python module
+
+* Optionally, activate your Python virtual environment
+
+* Install with pip
+
+    pip install --no-build-isolation .
