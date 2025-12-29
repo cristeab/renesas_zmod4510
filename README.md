@@ -7,7 +7,7 @@ The following changes have been made:
 - the algorithm libraries are provided only for Raspberry Pi,
 - cmake is used for compilation management
 
-# Compilation Instructions
+# Compile the Sample Application
 
 From the sources root folder:
 
@@ -22,7 +22,7 @@ Run the generated binary with:
 build/no2_o3-example
 ```
 
-# Install the Python module
+# Compile and Install the Python Module
 
 * Optionally, create and activate a Python virtual environment
 
