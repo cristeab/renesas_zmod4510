@@ -50,9 +50,9 @@ class ZMOD4510:
             return False
         return True
 
-    def get_data(self, temperature, humidity):
+    def get_data(self, temperature_celsius_deg = -300, relative_humidity_percent = 50):
         results = SensorResults()
-        self._lib.sensor_step(temperature, humidity, ctypes.byref(results))
+        self._lib.sensor_step(temperature_celsius_deg, relative_humidity_percent, ctypes.byref(results))
         return results
 
     def stop(self):
@@ -69,10 +69,7 @@ if __name__ == "__main__":
         
         while True:
             # Example: You could get real T/RH from another Python library here
-            current_temp = -300 
-            current_rh = 50
-            
-            data = sensor.get_data(current_temp, current_rh)
+            data = sensor.get_data()
             
             match data.status:
                 case ZMODStatus.STABILIZATION:
