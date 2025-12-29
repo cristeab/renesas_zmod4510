@@ -24,12 +24,12 @@ class SensorResults(ctypes.Structure):
     ]
 
 class ZMOD4510:
-    def __init__(self, library_name="libzmod4510.so", logger=None, log_level=logging.INFO):
+    def __init__(self, logger=None, log_level=logging.INFO):
         self.logger = logger or logging.getLogger(__name__)
         logging.basicConfig(level=log_level)
 
         try:
-            library_path = os.path.join(os.path.dirname(__file__), "lib", library_name)
+            library_path = os.path.join(os.path.dirname(__file__), "lib", "libzmod4510.so")
             self._lib = ctypes.CDLL(library_path)
         except OSError as e:
             self.logger.error(f"Failed to load library: {e}")

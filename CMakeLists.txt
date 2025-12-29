@@ -2,6 +2,14 @@ cmake_minimum_required(VERSION 3.0)
 project(zmod4510)
 set(EXE_NAME no2_o3-example)
 
+if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  message(FATAL_ERROR "This project is only supported on Linux")
+endif()
+
+if(NOT CMAKE_SYSTEM_PROCESSOR MATCHES "arm|aarch64")
+  message(FATAL_ERROR "This library is designed for ARM/AArch64 platforms like Raspberry Pi")
+endif()
+
 # Set C standard
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED ON)
