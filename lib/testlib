@@ -1,0 +1,74 @@
+#!/bin/bash
+# =============================================
+#  ZMOD4510 - Kompletný test VŠETKÝCH knižníc
+# =============================================
+
+echo "=== ZMOD4510 - Test všetkých lib_no2_o3.a ==="
+echo "Systém: $(uname -m) | $(grep PRETTY_NAME /etc/os-release)"
+echo "=================================================="
+
+# Hľadáme z koreňa projektu (uprav podľa svojej cesty)
+BASE_DIR=~/Renesas-ZMOD4510-NO2_O3-Firmware   # ← uprav ak máš iný názov priečinka
+
+cd "$BASE_DIR" 2>/dev/null || {
+    echo "❌ Adresár $BASE_DIR neexistuje!"
+    echo "Zadaj správnu cestu k projektu:"
+    read -r BASE_DIR
+    cd "$BASE_DIR"
+}
+
+echo -e "Hľadám v: $(pwd)\n"
+
+# Nájdeme všetky lib_no2_o3.a (správne zaobchádzanie s medzerami)
+mapfile -t libraries < <(find . -name "lib_no2_o3.a" -type f | sort)
+
+echo "Nájdených knižníc: ${#libraries[@]}"
+echo "────────────────────────────────────────────────────────────"
+
+good=0
+recommended=""
+
+for lib in "${libraries[@]}"; do
+    echo -e "\n📁 $lib"
+    
+    # Správne spracovanie s medzerami
+    first_obj=$(ar -t "$lib" 2>/dev/null | head -1)
+    if [ -z "$first_obj" ]; then
+        echo "   ❌ Prázdna knižnica"
+        continue
+    fi
+    
+    arch_info=$(ar -t "$lib" | head -1 | xargs -I {} sh -c 'file "{}"' 2>/dev/null)
+    
+    echo "   → $arch_info"
+    
+    if echo "$arch_info" | grep -q "aarch64"; then
+        echo "   ✅ 64-bit aarch64  →  VHODNÁ pre Orange Pi Zero 3"
+        ((good++))
+        [[ -z "$recommended" ]] && recommended="$lib"
+    elif echo "$arch_info" | grep -q "32-bit.*ARM"; then
+        echo "   ❌ 32-bit armhf"
+    elif echo "$arch_info" | grep -q "64-bit"; then
+        echo "   ⚠️  64-bit (iný)"
+    else
+        echo "   ❓ Neznáma"
+    fi
+done
+
+echo -e "\n=================================================="
+echo "ZHRNUTIE: Nájdených ${#libraries[@]} knižníc, z toho $good kompatibilných (aarch64)"
+
+if [ -n "$recommended" ]; then
+    echo -e "\n🎯 Odporúčaná knižnica:"
+    echo "   $recommended"
+    echo -e "\nChceš ju automaticky aktivovať? (áno/nie)"
+    read -r ans
+    if [[ $ans == áno || $ans == a || $ans == yes || $ans == y ]]; then
+        cd lib 2>/dev/null || mkdir -p lib && cd lib
+        rm -f lib_no2_o3.a lib_zmod4xxx_cleaning.a
+        ln -s "../$recommended" lib_no2_o3.a
+        ln -s "../${recommended/no2_o3/zmod4xxx_cleaning}" lib_zmod4xxx_cleaning.a 2>/dev/null
+        echo "✅ Symlinky nastavené!"
+        ls -l lib_*.a
+    fi
+fi
