@@ -30,10 +30,10 @@
 #include "hal/hal.h"
 
 
-#define I2C_BUS_FILE "/dev/i2c-1"
-#define I2C_ADDRESS 0x33
+#define I2C_BUS_PATH_MAX_LEN 32
 
 static int i2c_file_descriptor = -1;
+static HalConfig_t hal_config = { .i2c_bus = 1, .i2c_address = 0x33 };
 
 // remember hal object for deinitialization
 static Interface_t*   _hal = NULL;
@@ -59,20 +59,23 @@ _SleepMS ( uint32_t  ms ) {
 
 static int
 _Connect ( ) {
+  char i2c_bus_file[I2C_BUS_PATH_MAX_LEN];
+  snprintf(i2c_bus_file, sizeof(i2c_bus_file), "/dev/i2c-%d", hal_config.i2c_bus);
+
   // Close existing file descriptor if open
   if (i2c_file_descriptor >= 0) {
     close(i2c_file_descriptor);
   }
 
   // Open the I2C device file
-  i2c_file_descriptor = open(I2C_BUS_FILE, O_RDWR);
+  i2c_file_descriptor = open(i2c_bus_file, O_RDWR);
   if (i2c_file_descriptor < 0) {
     perror("Failed to open the I2C bus file");
     return ecHALError;
   }
 
   // Set the I2C slave address
-  if (ioctl(i2c_file_descriptor, I2C_SLAVE, I2C_ADDRESS) < 0) {
+  if (ioctl(i2c_file_descriptor, I2C_SLAVE, hal_config.i2c_address) < 0) {
     perror("Failed to acquire I2C bus access and/or set slave address");
     close(i2c_file_descriptor);
     i2c_file_descriptor = -1;
@@ -161,8 +164,12 @@ _Reset ( ) {
 }
 
 int
-HAL_Init ( Interface_t*  hal ) {
+HAL_Init ( Interface_t*  hal, HalConfig_t const* cfg ) {
   _hal = hal;
+
+  if (cfg) {
+    hal_config = *cfg;
+  }
 
   int errorCode = _Connect ( );
 
