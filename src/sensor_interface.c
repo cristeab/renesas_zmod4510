@@ -121,7 +121,7 @@ void read_and_verify(zmod4xxx_dev_t* sensor, uint8_t* result, char const* id) {
 /* Initialize the hardware and algorithm */
 int sensor_init() {
     HalConfig_t hal_cfg;
-    hal_cfg.i2c_bus = 1;
+    hal_cfg.i2c_bus = ZMOD4510_I2C_BUS;
     hal_cfg.i2c_address = ZMOD4510_I2C_ADDR;
 
     ret = HAL_Init(&hal, &hal_cfg);
