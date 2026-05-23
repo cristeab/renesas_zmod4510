@@ -6,6 +6,8 @@ from enum import IntEnum
 from pathlib import Path
 import logging
 import os
+from ecomet_i2c_sensors.i2c import load_comet_yaml
+from ecomet_i2c_sensors.zmod4510 import zmod4510_constant
 
 
 class ZMODStatus(IntEnum):
@@ -24,8 +26,16 @@ class SensorResults(ctypes.Structure):
     ]
 
 class ZMOD4510:
-    def __init__(self, busnum=0, logger=None, log_level=logging.INFO):
-        self.logger = logger or logging.getLogger(__name__)
+    def __init__(self, address=zmod4510_constant.ZMOD4510_ADDRESS, busnum=0, logger=None, log_level=logging.INFO):
+        if i2c is None:
+            import ecomet_i2c_sensors.i2c as I2C
+            i2c = I2C
+        self.logger = logger or logging.getLogger(__name__)    
+        smb = load_comet_yaml()
+        if smb != -99 :
+           busnum = smb['i2c']['smb'].replace('i2c-', '')
+        else :
+           busnum = 0
         logging.basicConfig(level=log_level)
         self.busnum = int(busnum)
 
