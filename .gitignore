@@ -1,0 +1,8 @@
+*.o
+*.log
+/lib/lib_no2_o3.a
+/lib/lib_zmod4xxx_cleaning.a
+/lib/test_program
+/build
+/_skbuild
+/python/zmod4510.egg-info

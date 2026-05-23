@@ -120,10 +120,22 @@ void read_and_verify(zmod4xxx_dev_t* sensor, uint8_t* result, char const* id) {
 
 /* Initialize the hardware and algorithm */
 int sensor_init() {
-    ret = HAL_Init(&hal);
+    return sensor_init_with_bus(ZMOD4510_I2C_BUS);
+}
+
+int sensor_init_with_bus(int i2c_bus) {
+    return sensor_init_with_bus_and_addr(i2c_bus, ZMOD4510_I2C_ADDR);
+}
+
+int sensor_init_with_bus_and_addr(int i2c_bus, uint8_t i2c_addr) {
+    HalConfig_t hal_cfg;
+    hal_cfg.i2c_bus = i2c_bus;
+    hal_cfg.i2c_address = i2c_addr;
+
+    ret = HAL_Init(&hal, &hal_cfg);
     if (ret) return ret;
 
-    dev.i2c_addr = ZMOD4510_I2C_ADDR;
+    dev.i2c_addr = i2c_addr;
     dev.pid = ZMOD4510_PID;
     dev.init_conf = &zmod_no2_o3_sensor_cfg[INIT];
     dev.meas_conf = &zmod_no2_o3_sensor_cfg[MEASUREMENT];

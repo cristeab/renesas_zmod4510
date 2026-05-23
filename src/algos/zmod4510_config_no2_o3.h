@@ -30,6 +30,7 @@
 /**********************************/
 /* < Define I2C slave address > */
 #define ZMOD4510_I2C_ADDR 0x33
+#define ZMOD4510_I2C_BUS 0
 
 /**********************************/
 /* < Define product data length > */

@@ -125,6 +125,14 @@ typedef struct {
   int  ( *reset ) ( void*  handle );
 } Interface_t;
 
+/**
+ * @brief HAL runtime configuration
+ */
+typedef struct {
+  int      i2c_bus;      /**< I2C bus number, e.g. 1 for /dev/i2c-1 */
+  uint8_t  i2c_address;  /**< I2C slave address */
+} HalConfig_t;
+
 
 /**
  * @brief Initialize hardware and populate ::Interface_t object
@@ -138,7 +146,7 @@ typedef struct {
  * @retval  0   on success
  * @retval !=0  in case of error
  */
-int  HAL_Init ( Interface_t*  hal );
+int  HAL_Init ( Interface_t*  hal, HalConfig_t const* cfg );
 
 /**
  * @brief Cleanup before program exit

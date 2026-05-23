@@ -6,6 +6,8 @@ from enum import IntEnum
 from pathlib import Path
 import logging
 import os
+from ecomet_i2c_sensors.i2c import load_comet_yaml
+from zmod4510 import zmod4510_constant
 
 
 class ZMODStatus(IntEnum):
@@ -24,9 +26,20 @@ class SensorResults(ctypes.Structure):
     ]
 
 class ZMOD4510:
-    def __init__(self, logger=None, log_level=logging.INFO):
-        self.logger = logger or logging.getLogger(__name__)
+    def __init__(self, address=zmod4510_constant.ZMOD4510_ADDRESS, busnum=0, logger=None, log_level=logging.INFO, i2c=None, **kwargs):
+        if i2c is None:
+            import ecomet_i2c_sensors.i2c as I2C
+            i2c = I2C
+        self.i2c = i2c
+        self.logger = logger or logging.getLogger(__name__)    
+        smb = load_comet_yaml()
+        if smb != -99 :
+           busnum = smb['i2c']['smb'].replace('i2c-', '')
+        else :
+           busnum = 0
         logging.basicConfig(level=log_level)
+        self.busnum = int(busnum)
+        self.address = address
 
         try:
             library_path = os.path.join(os.path.dirname(__file__), "lib", "libzmod4510.so")
@@ -37,6 +50,8 @@ class ZMOD4510:
         
         # Define function signatures
         self._lib.sensor_init.restype = ctypes.c_int
+        self._lib.sensor_init_with_bus.argtypes = [ctypes.c_int]
+        self._lib.sensor_init_with_bus.restype = ctypes.c_int
 
         self._lib.sensor_step.argtypes = [ctypes.c_float, ctypes.c_float, ctypes.POINTER(SensorResults)]
         self._lib.sensor_step.restype = ctypes.c_int
@@ -44,9 +59,9 @@ class ZMOD4510:
         self._lib.sensor_close.restype = None
 
     def start(self):
-        res = self._lib.sensor_init()
+        res = self._lib.sensor_init_with_bus(self.busnum)
         if res != 0:
-            self.logger.error(f"Sensor Init Failed with code {res}")
+            self.logger.error(f"Sensor Init Failed with code {res} (bus {self.busnum})")
             return False
         return True
 
