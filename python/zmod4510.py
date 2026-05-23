@@ -26,10 +26,11 @@ class SensorResults(ctypes.Structure):
     ]
 
 class ZMOD4510:
-    def __init__(self, address=zmod4510_constant.ZMOD4510_ADDRESS, busnum=0, logger=None, log_level=logging.INFO):
+    def __init__(self, address=zmod4510_constant.ZMOD4510_ADDRESS, busnum=0, logger=None, log_level=logging.INFO, i2c=None, **kwargs):
         if i2c is None:
             import ecomet_i2c_sensors.i2c as I2C
             i2c = I2C
+        self.i2c = i2c
         self.logger = logger or logging.getLogger(__name__)    
         smb = load_comet_yaml()
         if smb != -99 :
@@ -38,6 +39,7 @@ class ZMOD4510:
            busnum = 0
         logging.basicConfig(level=log_level)
         self.busnum = int(busnum)
+        self.address = address
 
         try:
             library_path = os.path.join(os.path.dirname(__file__), "lib", "libzmod4510.so")
