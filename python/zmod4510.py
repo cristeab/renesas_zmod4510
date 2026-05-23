@@ -24,9 +24,10 @@ class SensorResults(ctypes.Structure):
     ]
 
 class ZMOD4510:
-    def __init__(self, logger=None, log_level=logging.INFO):
+    def __init__(self, busnum=0, logger=None, log_level=logging.INFO):
         self.logger = logger or logging.getLogger(__name__)
         logging.basicConfig(level=log_level)
+        self.busnum = int(busnum)
 
         try:
             library_path = os.path.join(os.path.dirname(__file__), "lib", "libzmod4510.so")
@@ -37,6 +38,8 @@ class ZMOD4510:
         
         # Define function signatures
         self._lib.sensor_init.restype = ctypes.c_int
+        self._lib.sensor_init_with_bus.argtypes = [ctypes.c_int]
+        self._lib.sensor_init_with_bus.restype = ctypes.c_int
 
         self._lib.sensor_step.argtypes = [ctypes.c_float, ctypes.c_float, ctypes.POINTER(SensorResults)]
         self._lib.sensor_step.restype = ctypes.c_int
@@ -44,9 +47,9 @@ class ZMOD4510:
         self._lib.sensor_close.restype = None
 
     def start(self):
-        res = self._lib.sensor_init()
+        res = self._lib.sensor_init_with_bus(self.busnum)
         if res != 0:
-            self.logger.error(f"Sensor Init Failed with code {res}")
+            self.logger.error(f"Sensor Init Failed with code {res} (bus {self.busnum})")
             return False
         return True
 

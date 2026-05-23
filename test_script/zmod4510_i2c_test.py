@@ -16,7 +16,7 @@ formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
 #console.setFormatter(formatter)
 #logging.getLogger('').addHandler(console)
 
-sensor = zmod4510.ZMOD4510(logger=logger)
+sensor = zmod4510.ZMOD4510(busnum=0, logger=logger, log_level=logging.INFO)
 
 sensor.logger = logging.getLogger('zmod4510.zmod4510')
 sensor.logger.info('Start logging ...')

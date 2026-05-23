@@ -12,6 +12,7 @@ typedef struct {
 } sensor_results_t;
 
 int sensor_init();
+int sensor_init_with_bus(int i2c_bus);
 void sensor_step(float temp, float humidity, sensor_results_t* out);
 void sensor_close();
 
