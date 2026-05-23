@@ -7,7 +7,7 @@ from pathlib import Path
 import logging
 import os
 from ecomet_i2c_sensors.i2c import load_comet_yaml
-from ecomet_i2c_sensors.zmod4510 import zmod4510_constant
+from zmod4510 import zmod4510_constant
 
 
 class ZMODStatus(IntEnum):
